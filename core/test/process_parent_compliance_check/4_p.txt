@@ -1,0 +1,4 @@
+#[match=absent]
+line1
+#[match=absent]
+line2

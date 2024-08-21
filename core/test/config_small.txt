@@ -1,0 +1,25 @@
+version 17.12
+!
+service timestamps debug datetime msec
+!
+service timestamps log datetime localtime show-timezone
+service password-encryption
+!
+aaa group server tacacs+ TACACS_Servers
+ server name ISE-CRIH
+ server name ISE-DC9F
+aaa group server tacacs+ TACACS_Servers1
+ server name ISE-CRIH
+ server name ISE-DC9F
+aaa group server tacacs+ TACACS_Servers2
+ server name ISE-CRIH
+ server name ISE-DC9F
+!
+redundancy
+ mode sso
+ main-cpu
+  standby console enable
+!
+service timestamps debug datetime msec
+!
+mdns-sd gateway

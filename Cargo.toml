@@ -1,0 +1,19 @@
+[workspace]
+resolver = "2"
+
+members = [
+    "core", 
+    "cli",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Clem"]
+description = "FCC. A configuration compliance tool for network devices."
+repository = ""
+license = ""
+documentation = ""
+
+[workspace.dependencies]
+log = "0.4.22"
