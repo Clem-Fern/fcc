@@ -8,7 +8,7 @@ pub use crate::parse::error::ParseError;
 #[derive(Debug)]
 pub enum FlatConfigError {
     Parse(ParseError),
-    IO(io::Error)
+    IO(io::Error),
 }
 
 impl error::Error for FlatConfigError {}
@@ -21,7 +21,7 @@ impl fmt::Display for FlatConfigError {
             }
             Self::IO(ref err) => {
                 write!(f, "Flat configuration IO error: {err}")
-            },
+            }
         }
     }
 }

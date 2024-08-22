@@ -147,7 +147,10 @@ impl FlatConfigCompliance {
 
     pub fn new_from_raw(raw_config: &str) -> Result<Self, FlatConfigError> {
         if raw_config.trim().is_empty() {
-            return Err(FlatConfigError::IO(io::Error::new(io::ErrorKind::Other, "Input policy is empty.")));
+            return Err(FlatConfigError::IO(io::Error::new(
+                io::ErrorKind::Other,
+                "Input policy is empty.",
+            )));
         }
 
         Ok(parse_configuration(raw_config, None)?)

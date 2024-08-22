@@ -25,7 +25,7 @@ pub enum Commands {
     },
 
     /// Configuration related commands
-    Config{
+    Config {
         #[command(subcommand)]
         command: ConfigCommands,
     },

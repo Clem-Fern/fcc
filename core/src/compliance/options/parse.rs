@@ -121,10 +121,7 @@ mod tests {
     use super::*;
 
     #[cfg(not(debug_assertions))]
-    use crate::{
-        config::FlatConfigParent,
-        parse::process_next_indent_level,
-    };
+    use crate::{config::FlatConfigParent, parse::process_next_indent_level};
 
     #[cfg(debug_assertions)]
     use crate::{

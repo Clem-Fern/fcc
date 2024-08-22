@@ -60,7 +60,6 @@ pub(crate) fn process_next_indent_level(
     vals: &mut Peekable<impl Iterator<Item = String> + Clone>,
     previous_parent: &mut dyn ItemsContainer,
 ) -> Result<(), ParseError> {
-
     let previous_parent_indent = previous_parent.get_indent();
     let nb_same_indent = vals
         .clone()
@@ -72,14 +71,23 @@ pub(crate) fn process_next_indent_level(
         .map(|f| FlatConfigItem::Line(FlatConfigLine::new(&f[previous_parent_indent..f.len()])))
         .collect();
 
-    trace!("Take While (indent {}): found {}", previous_parent.get_indent(), same_indent.len());
+    trace!(
+        "Take While (indent {}): found {}",
+        previous_parent.get_indent(),
+        same_indent.len()
+    );
 
     previous_parent.appends_items(&same_indent);
 
     while let Some(next_val) = vals.peek() {
         let indent = nb_whitespace_at_start(next_val);
 
-        trace!("next value: indent {}, found: {}, compare with previous indent {}", indent, next_val, previous_parent.get_indent());
+        trace!(
+            "next value: indent {}, found: {}, compare with previous indent {}",
+            indent,
+            next_val,
+            previous_parent.get_indent()
+        );
 
         match indent.cmp(&previous_parent_indent) {
             Ordering::Equal => {

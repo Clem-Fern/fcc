@@ -1,6 +1,6 @@
+mod commands;
 mod misc;
 mod net;
-mod commands;
 
 use clap::Parser;
 use clap_verbosity_flag::{InfoLevel, Verbosity};

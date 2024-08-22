@@ -8,27 +8,21 @@ use crate::Cli;
 #[derive(Subcommand)]
 pub enum ConfigCommands {
     /// Retreive configuration from target device(s)
-    Get {
-
-    },
+    Get {},
 
     /// Check configuration compliance for a given policy
-    Check{
-        
-    },
+    Check {},
 
     /// Test device connectivity
-    Test {
-        
-    }
+    Test {},
 }
 
 impl ConfigCommands {
     pub fn matches(cli: &Cli, command: &Self) -> Result<(), Box<dyn Error>> {
         match command {
-            ConfigCommands::Get {  } => config_subcommand_get(cli)?,
-            ConfigCommands::Test {  } => todo!(),
-            ConfigCommands::Check {  } => config_subcommand_check(cli)?,
+            ConfigCommands::Get {} => config_subcommand_get(cli)?,
+            ConfigCommands::Test {} => todo!(),
+            ConfigCommands::Check {} => config_subcommand_check(cli)?,
         }
         Ok(())
     }
@@ -36,7 +30,7 @@ impl ConfigCommands {
 
 fn config_subcommand_get(_cli: &Cli) -> Result<(), Box<dyn Error>> {
     trace!("config_subcommand_get");
-    
+
     Ok(())
 }
 
