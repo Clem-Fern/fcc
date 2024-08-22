@@ -5,8 +5,11 @@ use std::{
     path::PathBuf,
 };
 
+mod config;
+
 use clap::{CommandFactory, Subcommand};
 use clap_complete::{generate, Shell};
+use config::ConfigCommands;
 use fcc::FlatConfigCompliance;
 use log::{info, trace, warn};
 
@@ -21,8 +24,11 @@ pub enum Commands {
         policies: Vec<PathBuf>,
     },
 
-    /// Check policy compliance on configuration file
-    ComplianceCheck,
+    /// Configuration related commands
+    Config{
+        #[command(subcommand)]
+        command: ConfigCommands,
+    },
 
     /// shell completion
     Completion {
@@ -35,7 +41,7 @@ impl Commands {
     pub fn matches(cli: &Cli) -> Result<(), Box<dyn Error>> {
         match &cli.command {
             Commands::Lint { policies } => subcommand_lint(cli, policies)?,
-            Commands::ComplianceCheck => subcommand_compliance_check(cli)?,
+            Commands::Config { command } => subcommand_config(cli, command)?,
             Commands::Completion { shell } => subcommand_completion(cli, shell)?,
         }
         Ok(())
@@ -76,8 +82,9 @@ fn subcommand_lint(_cli: &Cli, policies_path: &[PathBuf]) -> Result<(), Box<dyn 
     Ok(())
 }
 
-fn subcommand_compliance_check(_cli: &Cli) -> Result<(), Box<dyn Error>> {
-    
+fn subcommand_config(cli: &Cli, command: &ConfigCommands) -> Result<(), Box<dyn Error>> {
+    trace!("subcommand_config");
+    ConfigCommands::matches(cli, command)?;
     Ok(())
 }
 
