@@ -40,8 +40,12 @@ fn policy_subcommand_lint(_cli: &Cli, policies_path: &[PathBuf]) -> Result<()> {
         }
 
         if *path == PathBuf::from("-") {
-            if stdin().is_terminal() || policies_path.len() != 1 {
+            if policies_path.len() != 1 {
                 return Err(anyhow!("Reading from stdin one time is enough."));
+            }
+
+            if stdin().is_terminal() {
+                return Err(anyhow!("\"-\" nothing to read from there."));
             }
 
             let mut read = BufReader::new(stdin().lock());
