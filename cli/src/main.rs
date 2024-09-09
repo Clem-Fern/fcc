@@ -38,7 +38,8 @@ async fn main() {
     let res = Commands::matches(&cli);
 
     if res.is_err() {
-        error!("FCC Error: {}", res.err().unwrap());
+        error!("Error: {}", res.err().unwrap());
+        error!("Try \"fcc -h\"");
         std::process::exit(2);
     }
 }
