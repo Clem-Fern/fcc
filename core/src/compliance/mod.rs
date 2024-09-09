@@ -11,22 +11,22 @@ use crate::{
 
 pub(crate) mod misc;
 pub(crate) mod options;
-pub use misc::ComplianceResult;
+pub use misc::ItemComplianceResult;
 
 //TODO: compliance result
+//TODO: ref result display/format
 pub fn check_compliance(
     policy: FlatConfigCompliance,
     config: FlatConfig,
-) -> Result<(), FlatConfigError> {
-    process_parent_compliance_check(&policy, &config);
-    Ok(())
+) -> Result<Vec<ItemComplianceResult>, FlatConfigError> {
+    Ok(process_parent_compliance_check(&policy, &config))
 }
 
 fn process_parent_compliance_check(
     policies: &(impl ItemsContainer + ComplianceOptionsContainer),
     same_level_item: &impl ItemsContainer,
-) -> Vec<ComplianceResult> {
-    let mut compliance_result: Vec<ComplianceResult> = vec![];
+) -> Vec<ItemComplianceResult> {
+    let mut compliance_result: Vec<ItemComplianceResult> = vec![];
     let mut same_level_items = same_level_item.get_items().clone();
     for item in policies.get_items() {
         let item_options = item.get_options();
@@ -92,17 +92,17 @@ fn process_parent_compliance_check(
 fn process_item_matches_compliance(
     item: &FlatConfigItem,
     matches: Vec<&FlatConfigItem>,
-) -> Vec<ComplianceResult> {
-    let mut compliance_result: Vec<ComplianceResult> = vec![];
+) -> Vec<ItemComplianceResult> {
+    let mut compliance_result: Vec<ItemComplianceResult> = vec![];
 
     let match_type = item.get_options().match_type;
     match match_type {
         MatchOption::Present => {
             if matches.is_empty() {
-                compliance_result.push(ComplianceResult::new_present_nok(item.clone(), None));
+                compliance_result.push(ItemComplianceResult::new_present_nok(item.clone(), None));
             } else {
                 for matching_item in matches {
-                    compliance_result.push(ComplianceResult::new_ok(
+                    compliance_result.push(ItemComplianceResult::new_ok(
                         item.clone(),
                         Some(matching_item.clone()),
                     ));
@@ -118,11 +118,11 @@ fn process_item_matches_compliance(
         }
         MatchOption::Absent => {
             if matches.is_empty() {
-                compliance_result.push(ComplianceResult::new_ok(item.clone(), None));
+                compliance_result.push(ItemComplianceResult::new_ok(item.clone(), None));
             } else {
                 for matching_item in matches {
                     let matching_item = matching_item.clone();
-                    compliance_result.push(ComplianceResult::new_absent_nok(
+                    compliance_result.push(ItemComplianceResult::new_absent_nok(
                         item.clone(),
                         Some(matching_item.clone()),
                     ))

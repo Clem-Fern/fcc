@@ -3,13 +3,13 @@ use std::{error, fmt};
 use crate::config::FlatConfigItem;
 
 #[derive(Debug, Clone)]
-pub struct ComplianceResult {
+pub struct ItemComplianceResult {
     pub policy: FlatConfigItem,
     pub item: Option<FlatConfigItem>,
     pub result: Result<(), ComplianceError>,
 }
 
-impl ComplianceResult {
+impl ItemComplianceResult {
     pub fn new_ok(policy: FlatConfigItem, item: Option<FlatConfigItem>) -> Self {
         Self {
             policy,
@@ -35,7 +35,7 @@ impl ComplianceResult {
     }
 }
 
-impl fmt::Display for ComplianceResult {
+impl fmt::Display for ItemComplianceResult {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Policy \"{}\" ", self.policy.get_item_key())?;
 

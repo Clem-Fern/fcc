@@ -77,7 +77,9 @@ fn config_subcommand_check(
         match read_to_string(path) {
             Ok(raw_policy) => match FlatConfigCompliance::new_from_raw(&raw_policy) {
                 Ok(fcc) => {
-                    let _ = check_compliance(fcc, config.clone());
+                    //TODO: ref result display/format
+                    let result = check_compliance(fcc, config.clone()).unwrap();
+                    dbg!(result);
                 }
                 Err(err) => {
                     if ignore_invalid_policy {
