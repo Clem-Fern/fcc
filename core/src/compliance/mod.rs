@@ -44,11 +44,12 @@ fn process_parent_compliance_check(
             .filter(|f| -> bool {
                 let mut eq = item.eq(f);
 
-                if item_options.regex {
-                    eq = regex.clone().unwrap().is_match(f.get_item_key());
+                if let Some(regex) = regex.clone() {
+                    eq = regex.is_match(f.get_item_key());
                 }
 
                 if matches!(item_options.match_type, MatchOption::Present) {
+                    // is_variant_eq check eq enum variant type
                     eq = eq && item.is_variant_eq(f);
                 }
 
