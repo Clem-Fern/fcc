@@ -183,6 +183,7 @@ impl ItemsContainer for FlatConfigCompliance {
     }
 }
 
+// TODO: remove this ?
 impl ComplianceOptionsContainer for FlatConfigCompliance {
     fn get_options(&self) -> options::ComplianceOptions {
         todo!()

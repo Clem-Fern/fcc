@@ -46,6 +46,11 @@ pub(crate) fn process_fcc_options(parent: &mut dyn ItemsContainer) -> Result<(),
             item_options.clear();
         }
 
+        // Check regex synthax
+        if item_with_options.get_options().regex {
+            Regex::new(&format!("^{}$", item_with_options.get_item_key())).map_err(|err| ParseError::InvalidRegex(err, item_with_options.get_item_key().to_string()))?;
+        }
+
         if let FlatConfigItem::Parent(ref mut parent) = item_with_options {
             if matches!(parent.get_options().match_type, MatchOption::Absent) {
                 // If parent must be absent, ignore children items
@@ -249,6 +254,24 @@ mod tests {
         assert!(matches!(
             config.items.first().unwrap(),
             FlatConfigItem::Line(_)
+        ));
+    }
+
+    #[test]
+    fn test_process_fcc_options_invalid_regex() {
+        let mut config = FlatConfigParent::default();
+        let mut lines = include_str!("../../../test/process_fcc_options/6.txt")
+            .lines()
+            .map(String::from)
+            .peekable();
+
+        process_next_indent_level(&mut lines, &mut config).unwrap();
+        let result = process_fcc_options(&mut config);
+
+        assert!(result.is_err());
+        assert!(matches!(
+            result.err().unwrap(),
+            ParseError::InvalidRegex(_, _)
         ));
     }
 

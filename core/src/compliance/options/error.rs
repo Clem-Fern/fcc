@@ -1,3 +1,4 @@
+use regex::Error as RegexError;
 use std::error;
 use std::fmt;
 
@@ -7,6 +8,7 @@ pub enum ParseError {
     UnknowOption(String),
     MalformedOption(String),
     InvalidOptionArgument(String, String),
+    InvalidRegex(RegexError, String),
 }
 
 impl error::Error for ParseError {}
@@ -31,6 +33,9 @@ impl fmt::Display for ParseError {
                     f,
                     "Unable to parse option argument \"{arg}\" from \"{option}\""
                 )
+            }
+            Self::InvalidRegex(ref err, ref key) => {
+                write!(f, "Regex error at line {key}. {err}")
             }
         }
     }

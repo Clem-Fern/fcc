@@ -96,9 +96,10 @@ pub(crate) fn process_next_indent_level(
             }
             Ordering::Greater => {
                 if previous_parent.get_items().is_empty() {
+                    // As this is call when indent change, previous parent can't be empty
                     return Err(ParseError::BadIndentation(String::from(next_val)));
                 }
-                trace!("next value: indent {}, found: {}, compare with previous indent {}: create parent", indent, next_val, previous_parent.get_indent());
+                trace!("next value: indent {}, found: {}, compare with previous indent {}: get or create parent", indent, next_val, previous_parent.get_indent());
                 let previous_item = previous_parent.pop_last_item().unwrap();
                 let mut parent = match previous_item {
                     FlatConfigItem::Line(line) => FlatConfigParent::new(indent, line.line),
