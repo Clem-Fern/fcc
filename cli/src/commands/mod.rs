@@ -1,6 +1,7 @@
 use std::io::{self};
 
 mod config;
+mod manifest;
 mod policy;
 
 use anyhow::Result;
@@ -8,6 +9,7 @@ use clap::{CommandFactory, Subcommand};
 use clap_complete::{generate, Shell};
 use config::ConfigCommands;
 use log::trace;
+use manifest::ManifestCommands;
 use policy::PolicyCommands;
 
 use crate::Cli;
@@ -26,6 +28,12 @@ pub enum Commands {
         command: ConfigCommands,
     },
 
+    /// Manifest related commands
+    Manifest {
+        #[command(subcommand)]
+        command: ManifestCommands,
+    },
+
     /// shell completion
     Completion {
         #[arg(value_enum)]
@@ -38,6 +46,7 @@ impl Commands {
         match &cli.command {
             Commands::Policy { command } => subcommand_policy(cli, command)?,
             Commands::Config { command } => subcommand_config(cli, command)?,
+            Commands::Manifest { command } => subcommand_manifest(cli, command)?,
             Commands::Completion { shell } => subcommand_completion(cli, shell)?,
         }
         Ok(())
@@ -53,6 +62,12 @@ fn subcommand_policy(cli: &Cli, command: &PolicyCommands) -> Result<()> {
 fn subcommand_config(cli: &Cli, command: &ConfigCommands) -> Result<()> {
     trace!("subcommand_config");
     ConfigCommands::matches(cli, command)?;
+    Ok(())
+}
+
+fn subcommand_manifest(cli: &Cli, command: &ManifestCommands) -> Result<()> {
+    trace!("subcommand_manifest");
+    ManifestCommands::matches(cli, command)?;
     Ok(())
 }
 

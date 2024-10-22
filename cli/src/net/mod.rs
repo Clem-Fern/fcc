@@ -4,6 +4,6 @@ use serde::Serialize;
 #[serde(rename_all = "kebab-case")]
 pub enum GetConfigProtocol {
     SshExec,
-    RestConf,
-    NetConf,
+    Restconf,
+    Netconf,
 }

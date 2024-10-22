@@ -48,7 +48,9 @@ pub(crate) fn process_fcc_options(parent: &mut dyn ItemsContainer) -> Result<(),
 
         // Check regex synthax
         if item_with_options.get_options().regex {
-            Regex::new(&format!("^{}$", item_with_options.get_item_key())).map_err(|err| ParseError::InvalidRegex(err, item_with_options.get_item_key().to_string()))?;
+            Regex::new(&format!("^{}$", item_with_options.get_item_key())).map_err(|err| {
+                ParseError::InvalidRegex(err, item_with_options.get_item_key().to_string())
+            })?;
         }
 
         if let FlatConfigItem::Parent(ref mut parent) = item_with_options {

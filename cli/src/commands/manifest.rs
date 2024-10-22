@@ -12,26 +12,31 @@ use log::{info, trace, warn};
 use crate::Cli;
 
 #[derive(Subcommand)]
-pub enum PolicyCommands {
-    /// Verify policy file(s) syntax
+pub enum ManifestCommands {
+    /// Verify manifest file(s) syntax
     Lint {
-        /// The path to the policy file to read, use - to read from stdin (must not be a tty)
-        #[arg(value_name = "POLICY", required = true)]
-        policies: Vec<PathBuf>,
+        /// The path to the manifest file to read, use - to read from stdin (must not be a tty)
+        #[arg(value_name = "MANIFEST", required = true)]
+        manifests: Vec<PathBuf>,
     },
 }
 
-impl PolicyCommands {
+impl ManifestCommands {
     pub fn matches(cli: &Cli, command: &Self) -> Result<()> {
         match command {
-            PolicyCommands::Lint { policies } => policy_subcommand_lint(cli, policies)?,
+            ManifestCommands::Lint { manifests } => manifest_subcommand_lint(cli, manifests)?,
+            // ManifestCommands::Check {
+            //     config,
+            //     policies,
+            //     ignore_invalid_policy,
+            // } => config_subcommand_check(cli, config, policies, *ignore_invalid_policy)?,
         }
         Ok(())
     }
 }
 
-fn policy_subcommand_lint(_cli: &Cli, policies_path: &[PathBuf]) -> Result<()> {
-    for path in policies_path {
+fn manifest_subcommand_lint(_cli: &Cli, manifests_path: &[PathBuf]) -> Result<()> {
+    for path in manifests_path {
         trace!("subcommand_lint path {}", path.display());
         let mut data = String::new();
 
@@ -40,7 +45,7 @@ fn policy_subcommand_lint(_cli: &Cli, policies_path: &[PathBuf]) -> Result<()> {
         }
 
         if *path == PathBuf::from("-") {
-            if policies_path.len() != 1 {
+            if manifests_path.len() != 1 {
                 return Err(anyhow!("Reading from stdin one time is enough."));
             }
 
