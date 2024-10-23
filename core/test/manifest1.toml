@@ -1,6 +1,6 @@
 # at least one policies must be present
 [[policies]]
-path= [
+paths = [
     "policy1", # relative path, relative to manifest file path
     "./policy2", # same as above
     "/tmp/policy3" # absolut path
@@ -8,29 +8,45 @@ path= [
 
 [[policies]]
 # recursive option ? TODO
-path= [
+paths = [
     "policies", # if a directory, get all files from it
 ]
 
 # at least one configs must be present
 [[configs]]
-# configs parsing related option ? TODO
+# configs parsing related option
+# regignore: regex used to ignore lines from configuration
+# regignore: recommanded to ignore comments (like ! with Cisco)
+# regignore = "^\\s*!.*$" 
 
-# apply policies
+# retrieve configurations from files
 [[configs.files]]
-path= [
+# recursive option ? TODO
+paths = [
     "config1", # relative path, relative to manifest file path
     "./config2", # same as above
     "/tmp/config3" # absolut path
 ]
 
-# apply policies
+# retrieve configurations from remote using ssh exec
 [[configs.ssh-exec]]
 cmd = "show running"
 user = "clem"
-
+# auth ? ask passwd ? key ? passphrase ? ask passphrase ? TODO
 hosts= [
     "192.168.1.2:22",
     "192.168.13.2:22",
     "192.168.1.5:22",
 ]
+
+# TODO
+# retrieve configurations from remote using netconf
+# [[configs.netconf]]
+# candidate = "running"
+# user = "clem"
+# # auth ? ask passwd ? key ? passphrase ? ask passphrase ? TODO
+# hosts= [
+#     "192.168.1.2:830",
+#     "192.168.13.2:830",
+#     "192.168.1.5:830",
+# ]
