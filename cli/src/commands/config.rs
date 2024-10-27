@@ -2,6 +2,7 @@ use std::{
     fs::{read_to_string, File},
     io::{stdin, BufReader, IsTerminal, Read},
     path::PathBuf,
+    str::FromStr,
 };
 
 use anyhow::{anyhow, Result};
@@ -70,12 +71,12 @@ fn config_subcommand_check(
         read.read_to_string(&mut raw_config)?;
     }
 
-    let config = FlatConfig::new_from_raw(&raw_config)?;
+    let config = FlatConfig::from_str(&raw_config)?;
 
     for path in policies {
         trace!("config_subcommand_check policy {}", path.display());
         match read_to_string(path) {
-            Ok(raw_policy) => match FlatConfigCompliance::new_from_raw(&raw_policy) {
+            Ok(raw_policy) => match FlatConfigCompliance::from_str(&raw_policy) {
                 Ok(fcc) => {
                     //TODO: ref result display/format
                     let result = check_compliance(fcc, config.clone()).unwrap();

@@ -1,14 +1,16 @@
+use std::str::FromStr;
+
 use crate::{compliance::misc::ComplianceError, config::FlatConfig};
 
 use super::{process_parent_compliance_check, FlatConfigCompliance};
 
 #[test]
 fn test_process_parent_compliance_check_ok() {
-    let policy = FlatConfigCompliance::new_from_raw(include_str!(
+    let policy = FlatConfigCompliance::from_str(include_str!(
         "../../test/process_parent_compliance_check/1_p.txt"
     ))
     .unwrap();
-    let config = FlatConfig::new_from_raw(include_str!(
+    let config = FlatConfig::from_str(include_str!(
         "../../test/process_parent_compliance_check/1_c.txt"
     ))
     .unwrap();
@@ -22,11 +24,11 @@ fn test_process_parent_compliance_check_ok() {
 
 #[test]
 fn test_process_parent_compliance_check_present_is_absent() {
-    let policy = FlatConfigCompliance::new_from_raw(include_str!(
+    let policy = FlatConfigCompliance::from_str(include_str!(
         "../../test/process_parent_compliance_check/2_p.txt"
     ))
     .unwrap();
-    let config = FlatConfig::new_from_raw(include_str!(
+    let config = FlatConfig::from_str(include_str!(
         "../../test/process_parent_compliance_check/2_c.txt"
     ))
     .unwrap();
@@ -43,11 +45,11 @@ fn test_process_parent_compliance_check_present_is_absent() {
 
 #[test]
 fn test_process_parent_compliance_check_absent_is_present() {
-    let policy = FlatConfigCompliance::new_from_raw(include_str!(
+    let policy = FlatConfigCompliance::from_str(include_str!(
         "../../test/process_parent_compliance_check/3_p.txt"
     ))
     .unwrap();
-    let config = FlatConfig::new_from_raw(include_str!(
+    let config = FlatConfig::from_str(include_str!(
         "../../test/process_parent_compliance_check/3_c.txt"
     ))
     .unwrap();
@@ -64,11 +66,11 @@ fn test_process_parent_compliance_check_absent_is_present() {
 
 #[test]
 fn test_process_parent_compliance_check_absent_ignore_enum_variant() {
-    let policy = FlatConfigCompliance::new_from_raw(include_str!(
+    let policy = FlatConfigCompliance::from_str(include_str!(
         "../../test/process_parent_compliance_check/4_p.txt"
     ))
     .unwrap();
-    let config = FlatConfig::new_from_raw(include_str!(
+    let config = FlatConfig::from_str(include_str!(
         "../../test/process_parent_compliance_check/1_c.txt"
     ))
     .unwrap();

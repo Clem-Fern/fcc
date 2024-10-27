@@ -2,6 +2,7 @@ use std::{
     fs::File,
     io::{stdin, BufReader, IsTerminal, Read},
     path::PathBuf,
+    str::FromStr,
 };
 
 use anyhow::{anyhow, Result};
@@ -55,7 +56,7 @@ fn policy_subcommand_lint(_cli: &Cli, policies: &[PathBuf]) -> Result<()> {
             read.read_to_string(&mut data)?;
         }
 
-        match FlatConfigCompliance::new_from_raw(&data) {
+        match FlatConfigCompliance::from_str(&data) {
             Ok(_) => {
                 info!("{}: Syntax OK.", path.display());
             }

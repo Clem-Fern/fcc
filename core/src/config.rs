@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::{
     compliance::options::{ComplianceOptions, ComplianceOptionsContainer},
     error::FlatConfigError,
@@ -16,13 +18,17 @@ impl FlatConfig {
     pub fn new() -> Self {
         Self::default()
     }
+}
 
-    pub fn new_from_raw(raw_config: &str) -> Result<Self, FlatConfigError> {
+impl FromStr for FlatConfig {
+    type Err = FlatConfigError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         let options = ParseOption {
             ignore_options: true,
             ..Default::default()
         };
-        Ok(parse_configuration(raw_config, Some(options))?)
+        Ok(parse_configuration(s, Some(options))?)
     }
 }
 

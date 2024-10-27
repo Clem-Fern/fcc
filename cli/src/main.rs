@@ -1,6 +1,7 @@
 mod commands;
+#[allow(dead_code)]
+mod manifest;
 mod misc;
-mod net;
 
 use clap::Parser;
 use clap_verbosity_flag::{InfoLevel, Verbosity};

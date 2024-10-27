@@ -1,0 +1,24 @@
+# at least one policies must be present
+[[policies]]
+paths = [
+    "policy_small_options.txt",
+    "./policy_small_real_options.txt",
+]
+
+[[policies]]
+paths = [
+    "process_parent_compliance_check",
+]
+
+[[configs]]
+
+[[configs.files]]
+paths = [
+    "config.txt",
+    "config_small.txt",
+]
+
+[[configs.files]]
+paths = [
+    "process_parent_compliance_check",
+]

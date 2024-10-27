@@ -1,4 +1,4 @@
-use std::io;
+use std::{io, str::FromStr};
 
 use options::{ComplianceOptionsContainer, MatchOption};
 use regex::Regex;
@@ -145,16 +145,20 @@ impl FlatConfigCompliance {
     pub fn new() -> Self {
         Self::default()
     }
+}
 
-    pub fn new_from_raw(raw_config: &str) -> Result<Self, FlatConfigError> {
-        if raw_config.trim().is_empty() {
+impl FromStr for FlatConfigCompliance {
+    type Err = FlatConfigError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s.trim().is_empty() {
             return Err(FlatConfigError::IO(io::Error::new(
                 io::ErrorKind::Other,
                 "Input policy is empty.",
             )));
         }
 
-        Ok(parse_configuration(raw_config, None)?)
+        Ok(parse_configuration(s, None)?)
     }
 }
 
