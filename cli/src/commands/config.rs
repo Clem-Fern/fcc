@@ -45,7 +45,7 @@ impl ConfigCommands {
 fn config_subcommand_check(
     _cli: &Cli,
     config_path: &PathBuf,
-    policies_path: &[PathBuf],
+    policies: &[PathBuf],
     ignore_invalid_policy: bool,
 ) -> Result<()> {
     trace!("config_subcommand_check config {}", config_path.display());
@@ -72,7 +72,7 @@ fn config_subcommand_check(
 
     let config = FlatConfig::new_from_raw(&raw_config)?;
 
-    for path in policies_path {
+    for path in policies {
         trace!("config_subcommand_check policy {}", path.display());
         match read_to_string(path) {
             Ok(raw_policy) => match FlatConfigCompliance::new_from_raw(&raw_policy) {

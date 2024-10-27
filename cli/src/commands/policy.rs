@@ -30,9 +30,9 @@ impl PolicyCommands {
     }
 }
 
-fn policy_subcommand_lint(_cli: &Cli, policies_path: &[PathBuf]) -> Result<()> {
-    for path in policies_path {
-        trace!("subcommand_lint path {}", path.display());
+fn policy_subcommand_lint(_cli: &Cli, policies: &[PathBuf]) -> Result<()> {
+    for path in policies {
+        trace!("policy_subcommand_lint path {}", path.display());
         let mut data = String::new();
 
         if path.is_dir() {
@@ -40,7 +40,7 @@ fn policy_subcommand_lint(_cli: &Cli, policies_path: &[PathBuf]) -> Result<()> {
         }
 
         if *path == PathBuf::from("-") {
-            if policies_path.len() != 1 {
+            if policies.len() != 1 {
                 return Err(anyhow!("Reading from stdin one time is enough."));
             }
 
