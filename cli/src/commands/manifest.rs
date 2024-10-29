@@ -7,10 +7,9 @@ use std::{
 
 use anyhow::{anyhow, Result};
 use clap::Subcommand;
-use fcc::FlatConfigCompliance;
 use log::{info, trace, warn};
 
-use crate::Cli;
+use crate::{manifest::ComplianceManifest, Cli};
 
 #[derive(Subcommand)]
 pub enum ManifestCommands {
@@ -64,7 +63,7 @@ fn manifest_subcommand_lint(_cli: &Cli, manifests: &[PathBuf]) -> Result<()> {
             read.read_to_string(&mut data)?;
         }
 
-        match FlatConfigCompliance::from_str(&data) {
+        match ComplianceManifest::from_str(&data) {
             Ok(_) => {
                 info!("{}: Syntax OK.", path.display());
             }
@@ -101,7 +100,7 @@ fn manifest_subcommand_check(_cli: &Cli, manifests: &[PathBuf]) -> Result<()> {
             read.read_to_string(&mut data)?;
         }
 
-        match FlatConfigCompliance::from_str(&data) {
+        match ComplianceManifest::from_str(&data) {
             Ok(_) => {
                 info!("{}: Syntax OK.", path.display());
             }
