@@ -1,0 +1,5 @@
+line 1 indent 0
+ line 2 indent 1
+  line 3 indent 2
+   line 4 indent 3
+    line 5 indent 4

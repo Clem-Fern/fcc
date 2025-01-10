@@ -1,0 +1,10 @@
+line 1 indent 0
+! comment
+ line 2 indent 1
+ ! comment
+  line 3 indent 2
+  ! comment
+   line 4 indent 3
+    ! comment
+    line 5 indent 4
+    

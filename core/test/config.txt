@@ -1,0 +1,70 @@
+version 17.12
+!
+service timestamps debug datetime msec
+!
+service timestamps log datetime localtime show-timezone
+service password-encryption
+!
+hostname WLC-9800
+boot-start-marker
+boot system bootflash:packages.conf
+!
+!
+vrf definition Mgmt-intf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+logging buffered 409600
+no logging console
+aaa new-model
+!
+!
+aaa group server tacacs+ TACACS_Servers
+ server name ISE-CRIH
+ server name ISE-DC9F
+!
+redundancy
+ mode sso
+ main-cpu
+  standby console enable
+!
+mdns-sd gateway
+!
+crypto engine compliance shield disable
+!
+vlan internal allocation policy ascending
+!
+vlan 1313
+ name wifi-iptv-mich
+!
+line con 0
+ exec-timeout 60 0
+ stopbits 1
+line aux 0
+line vty 0 4
+ authorization exec TACACS_Authz
+ login authentication TACACS_Authent
+ length 0
+ transport input ssh
+line vty 5 15
+ authorization exec TACACS_Authz
+ login authentication TACACS_Authent
+ transport input ssh
+!
+ntp server 10.38.10.254
+call-home
+ ! If contact email address in call-home is configured as sch-smart-licensing@cisco.com
+ ! the email address configured in Cisco Smart License Portal will be used as contact email address to send SCH notifications.
+ contact-email-addr sch-smart-licensing@cisco.com
+ profile "CiscoTAC-1"
+  active
+  destination transport-method http
+!
+netconf-yang
+restconf
+end
+
