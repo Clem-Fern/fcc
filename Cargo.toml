@@ -1,0 +1,27 @@
+[workspace]
+resolver = "2"
+
+members = [
+    "core", 
+    "cli",
+    "ansible"
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Clem"]
+description = "FCC. A configuration compliance tool for network devices."
+repository = ""
+license = "GPL-3.0"
+documentation = ""
+
+[workspace.dependencies]
+log = "0.4.22"
+regex = "1.11"
+
+[profile.release]
+strip = true
+opt-level = "z"
+lto = true
+codegen-units = 1

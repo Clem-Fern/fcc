@@ -1,0 +1,9 @@
+#[debug]
+line 1 indent 1
+  #[debug]   
+  line 2 indent 2
+    #[debug]
+    line 3 indent 3
+    #[debug]
+  line 4 indent 2
+    

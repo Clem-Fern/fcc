@@ -1,0 +1,2 @@
+#[debug]
+  line 2 indent 2

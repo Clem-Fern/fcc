@@ -1,0 +1,3 @@
+#[match=absent]
+line2
+  line3

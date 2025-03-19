@@ -1,0 +1,10 @@
+line 1 indent 0
+#[debug]
+line 2 indent 0
+#[debug]
+#[debug]
+line 3 indent 0
+#[debug]
+#[debug]
+#[debug]
+line 4 indent 0

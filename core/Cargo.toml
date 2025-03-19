@@ -1,0 +1,21 @@
+[package]
+name = "fcc"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description.workspace = true
+repository.workspace = true
+license.workspace = true
+documentation.workspace = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+serde = ["dep:serde"]
+
+[dependencies]
+log = { workspace = true }
+regex = { workspace = true }
+lazy_static = "1.5.0"
+strum = { version = "0.26", features = ["derive"] }
+serde = { version = "1", features = ["derive"], optional = true }

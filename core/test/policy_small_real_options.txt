@@ -1,0 +1,23 @@
+version 17.12
+
+service timestamps debug datetime msec
+
+service timestamps log datetime localtime show-timezone
+#[match=absent]
+service password-encryption
+
+#[regex]
+aaa group server tacacs\+ TACACS_Servers[0-9]?
+ #[debug]
+ #[debug]
+ server name serv1
+ server name serv2
+
+redundancy
+ mode sso
+ main-cpu
+  standby console enable
+
+service timestamps debug datetime msec
+
+mdns-sd gateway
