@@ -3,5 +3,5 @@ line2
     line3
 #[match=absent]
 line4
-#[match=absent]
+#[match=optional]
 line5

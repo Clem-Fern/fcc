@@ -5,6 +5,8 @@ service timestamps debug datetime msec
 service timestamps log datetime localtime show-timezone
 #[match=absent]
 service password-encryption
+#[match=optional]
+service password-encryption
 
 #[regex]
 aaa group server tacacs\+ TACACS_Servers[0-9]?

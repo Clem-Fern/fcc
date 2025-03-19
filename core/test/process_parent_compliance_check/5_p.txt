@@ -1,0 +1,7 @@
+#[match=optional]
+line1
+#[match=optional]
+line2
+    line3
+#[match=optional]
+line4
