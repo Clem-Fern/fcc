@@ -1,3 +1,3 @@
-#[match=absent]
+#[state=absent]
 line2
   line3

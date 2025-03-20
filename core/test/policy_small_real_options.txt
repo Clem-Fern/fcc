@@ -3,9 +3,9 @@ version 17.12
 service timestamps debug datetime msec
 
 service timestamps log datetime localtime show-timezone
-#[match=absent]
+#[state=absent]
 service password-encryption
-#[match=optional]
+#[state=optional]
 service password-encryption
 
 #[regex]

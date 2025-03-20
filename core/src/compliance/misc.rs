@@ -2,7 +2,7 @@ use std::{error, fmt};
 
 use crate::config::FlatConfigItem;
 
-use super::options::ComplianceOptionsContainer;
+use super::options::{ComplianceOptionsContainer, MatchOption, StateOption};
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
 #[derive(Debug, Clone)]
@@ -51,10 +51,19 @@ impl ItemComplianceResult {
 impl fmt::Display for ItemComplianceResult {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let options = self.policy.get_options();
-        write!(f, "Policy(match: {}", options.match_type)?;
+        write!(f, "Policy(state: {}", options.state)?;
+        if options.state != StateOption::default() {
+            write!(f, "state: {}", options.state)?;
+        }
+
         if options.regex {
             write!(f, ", regex=true")?;
         }
+
+        if options.r#match != MatchOption::default() {
+            write!(f, ", match={}", options.r#match)?;
+        }
+
         write!(f, ") \"{}\" ", self.policy.get_item_key())?;
 
         match &self.result {

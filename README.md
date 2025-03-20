@@ -42,7 +42,7 @@ Ansible tasks ex. :
     policy: |
         hostname TEST
 
-        #[match=absent]
+        #[state=absent]
         enable password cisco  
 
 ```

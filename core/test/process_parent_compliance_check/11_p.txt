@@ -1,0 +1,5 @@
+#[state=absent]
+#[match=first]
+line1
+line2
+line3

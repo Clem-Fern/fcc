@@ -1,7 +1,7 @@
 line1
 line2
     line3
-#[match=absent]
+#[state=absent]
 line4
-#[match=optional]
+#[state=optional]
 line5

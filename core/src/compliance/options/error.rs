@@ -7,6 +7,7 @@ pub enum ParseError {
     BadIndentation(String),
     UnknowOption(String),
     MalformedOption(String),
+    DuplicatedOption(String),
     InvalidOptionArgument(String, String),
     InvalidRegex(RegexError, String),
 }
@@ -27,6 +28,9 @@ impl fmt::Display for ParseError {
                     f,
                     "Unable to parse malformed option and argument: \"{option}\""
                 )
+            }
+            Self::DuplicatedOption(ref option) => {
+                write!(f, "Option \"{option}\" specified more than one.")
             }
             Self::InvalidOptionArgument(ref arg, ref option) => {
                 write!(

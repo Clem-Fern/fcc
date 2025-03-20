@@ -1,6 +1,6 @@
 use std::{io, str::FromStr};
 
-use options::{ComplianceOptionsContainer, MatchOption};
+use options::{ComplianceOptionsContainer, StateOption};
 use regex::Regex;
 
 use crate::{
@@ -48,7 +48,7 @@ fn process_parent_compliance_check(
                     eq = regex.is_match(f.get_item_key());
                 }
 
-                if matches!(item_options.match_type, MatchOption::Present) {
+                if matches!(item_options.state, StateOption::Present) {
                     // is_variant_eq check eq enum variant type
                     eq = eq && item.is_variant_eq(f);
                 }
@@ -96,11 +96,11 @@ fn process_item_matches_compliance(
 ) -> Vec<ItemComplianceResult> {
     let mut compliance_result: Vec<ItemComplianceResult> = vec![];
 
-    let match_type = item.get_options().match_type;
-    match match_type {
-        MatchOption::Present | MatchOption::Optional => {
+    let state = item.get_options().state;
+    match state {
+        StateOption::Present | StateOption::Optional => {
             if matches.is_empty() {
-                if matches!(match_type, MatchOption::Optional) {
+                if matches!(state, StateOption::Optional) {
                     compliance_result.push(ItemComplianceResult::new_present_nok_ok(item.clone()));
                 } else {
                     compliance_result.push(ItemComplianceResult::new_present_nok(item.clone()));
@@ -121,7 +121,7 @@ fn process_item_matches_compliance(
                 }
             }
         }
-        MatchOption::Absent => {
+        StateOption::Absent => {
             if matches.is_empty() {
                 compliance_result.push(ItemComplianceResult::new_absent_ok(item.clone()));
             } else {
