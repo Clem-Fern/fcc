@@ -140,7 +140,7 @@ mod tests {
 
         process_next_indent_level(&mut lines, &mut config).unwrap();
 
-        assert_eq!(config.items.is_empty(), true);
+        assert!(config.items.is_empty());
     }
 
     #[test]
@@ -179,7 +179,7 @@ mod tests {
 
         let mut item = &config;
         for n in 0..lines_count - 2 {
-            let parent = item.items.get(0).unwrap();
+            let parent = item.items.first().unwrap();
             assert!(matches!(parent, FlatConfigItem::Parent(_)));
             if let FlatConfigItem::Parent(parent) = parent {
                 item = parent;
@@ -220,7 +220,7 @@ mod tests {
         let config: FlatConfig = parse_configuration(raw, None).unwrap();
 
         assert_eq!(config.items.len(), 2);
-        let item = config.items.get(0).unwrap();
+        let item = config.items.first().unwrap();
         assert!(item.get_options().regex);
         assert!(matches!(item, FlatConfigItem::Parent(_)));
         if let FlatConfigItem::Parent(parent) = item {
@@ -240,7 +240,7 @@ mod tests {
         let config: FlatConfig = parse_configuration(raw, Some(options)).unwrap();
 
         assert_eq!(config.items.len(), 2);
-        let item = config.items.get(0).unwrap();
+        let item = config.items.first().unwrap();
         assert_eq!(item.get_options(), ComplianceOptions::default());
     }
 }

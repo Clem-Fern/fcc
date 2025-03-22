@@ -193,19 +193,19 @@ mod tests {
 
         process_fcc_options(&mut config).unwrap();
 
-        let item1 = config.items.get(0).unwrap();
+        let item1 = config.items.first().unwrap();
         assert_eq!(item1.get_raw_options().len(), 1);
         if let FlatConfigItem::Parent(parent) = item1 {
-            let item2 = parent.items.get(0).unwrap();
+            let item2 = parent.items.first().unwrap();
             assert_eq!(item2.get_raw_options().len(), 1);
             if let FlatConfigItem::Parent(parent) = item2 {
-                let item3 = parent.items.get(0).unwrap();
+                let item3 = parent.items.first().unwrap();
                 assert_eq!(item3.get_raw_options().len(), 1);
             } else {
-                assert!(false)
+                panic!()
             }
         } else {
-            assert!(false)
+            panic!()
         }
     }
 
@@ -223,7 +223,7 @@ mod tests {
         process_fcc_options(&mut config).unwrap();
 
         assert!(matches!(
-            config.items.get(0).unwrap(),
+            config.items.first().unwrap(),
             FlatConfigItem::Line(_)
         ));
     }
@@ -345,14 +345,14 @@ mod tests {
 
     #[test]
     fn test_parse_fcc_options_malformed() {
-        let err = ComplianceOptions::new_from_vec(&vec![String::from(" lkjhlkjh   ")]).unwrap_err();
+        let err = ComplianceOptions::new_from_vec(&[String::from(" lkjhlkjh   ")]).unwrap_err();
         assert!(matches!(err, ParseError::MalformedOption(_)));
 
         let err =
-            ComplianceOptions::new_from_vec(&vec![String::from("      #[state]   ")]).unwrap_err();
+            ComplianceOptions::new_from_vec(&[String::from("      #[state]   ")]).unwrap_err();
         assert!(matches!(err, ParseError::MalformedOption(_)));
 
-        let err = ComplianceOptions::new_from_vec(&vec![String::from(" #[match]   ")]).unwrap_err();
+        let err = ComplianceOptions::new_from_vec(&[String::from(" #[match]   ")]).unwrap_err();
         assert!(matches!(err, ParseError::MalformedOption(_)));
     }
 
@@ -367,24 +367,24 @@ mod tests {
     #[test]
     fn test_parse_fcc_options_invalid_arg() {
         let err =
-            ComplianceOptions::new_from_vec(&vec![String::from(" #[state=arg1]   ")]).unwrap_err();
+            ComplianceOptions::new_from_vec(&[String::from(" #[state=arg1]   ")]).unwrap_err();
         assert!(matches!(err, ParseError::InvalidOptionArgument(_, _)));
 
         let err =
-            ComplianceOptions::new_from_vec(&vec![String::from(" #[match=arg1]   ")]).unwrap_err();
+            ComplianceOptions::new_from_vec(&[String::from(" #[match=arg1]   ")]).unwrap_err();
         assert!(matches!(err, ParseError::InvalidOptionArgument(_, _)));
     }
 
     #[test]
     fn test_parse_fcc_options_duplicated() {
-        let err = ComplianceOptions::new_from_vec(&vec![
+        let err = ComplianceOptions::new_from_vec(&[
             String::from(" #[state=present]   "),
             String::from("#[state=present]"),
         ])
         .unwrap_err();
         assert!(matches!(err, ParseError::DuplicatedOption(_)));
 
-        let err = ComplianceOptions::new_from_vec(&vec![
+        let err = ComplianceOptions::new_from_vec(&[
             String::from(" #[match=all]   "),
             String::from(" #[match=all]   "),
         ])

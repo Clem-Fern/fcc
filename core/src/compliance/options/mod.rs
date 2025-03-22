@@ -136,7 +136,7 @@ mod tests {
     fn test_fcc_options_default() {
         let options = ComplianceOptions::default();
 
-        assert_eq!(options.regex, false);
+        assert!(!options.regex);
         assert!(matches!(options.state, StateOption::Present));
     }
 }
