@@ -59,7 +59,7 @@ impl ItemsContainer for FlatConfig {
 }
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialOrd, Ord)]
 pub enum FlatConfigItem {
     Line(FlatConfigLine),
     Parent(FlatConfigParent),
@@ -126,8 +126,9 @@ impl FlatConfigItem {
 }
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct FlatConfigLine {
+    pub index: usize,
     pub line: String,
     #[cfg(debug_assertions)]
     pub raw_options: Vec<String>,
@@ -155,8 +156,9 @@ impl ComplianceOptionsContainer for FlatConfigLine {
 }
 
 impl FlatConfigLine {
-    pub fn new(line: &str) -> Self {
+    pub fn new(index: usize, line: &str) -> Self {
         Self {
+            index,
             line: String::from(line),
             ..Default::default()
         }
@@ -164,6 +166,7 @@ impl FlatConfigLine {
 
     fn from_parent(p: FlatConfigParent) -> Self {
         Self {
+            index: p.index,
             line: p.key,
             #[cfg(debug_assertions)]
             raw_options: p.raw_options,
@@ -179,8 +182,9 @@ impl From<FlatConfigParent> for FlatConfigLine {
 }
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct FlatConfigParent {
+    pub index: usize,
     pub indent: usize,
     pub key: String,
     pub items: Vec<FlatConfigItem>,
@@ -190,16 +194,18 @@ pub struct FlatConfigParent {
 }
 
 impl FlatConfigParent {
-    pub fn new(indent: usize, key: String) -> Self {
+    pub fn new(index: usize, indent: usize, key: String) -> Self {
         Self {
+            index,
             indent,
             key,
             ..Default::default()
         }
     }
 
-    pub fn new_with_items(indent: usize, key: String, items: Vec<FlatConfigItem>) -> Self {
+    pub fn new_with_items(index: usize, indent: usize, key: String, items: Vec<FlatConfigItem>) -> Self {
         Self {
+            index,
             indent,
             key,
             items,

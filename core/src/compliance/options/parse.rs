@@ -148,6 +148,7 @@ mod tests {
             .lines()
             .filter(|f| !COMPLIANCE_OPTION_REGEX.is_match(f))
             .map(String::from)
+            .enumerate()
             .peekable();
 
         process_next_indent_level(&mut lines, &mut config).unwrap();
@@ -167,6 +168,7 @@ mod tests {
             .lines()
             .filter(|l| filter_line(l, None))
             .map(String::from)
+            .enumerate()
             .peekable();
 
         process_next_indent_level(&mut lines, &mut config).unwrap();
@@ -187,6 +189,7 @@ mod tests {
             .lines()
             .filter(|l| filter_line(l, None))
             .map(String::from)
+            .enumerate()
             .peekable();
 
         process_next_indent_level(&mut lines, &mut config).unwrap();
@@ -216,6 +219,7 @@ mod tests {
         let mut lines = include_str!("../../../test/process_fcc_options/3.txt")
             .lines()
             .map(String::from)
+            .enumerate()
             .peekable();
 
         process_next_indent_level(&mut lines, &mut config).unwrap();
@@ -235,6 +239,7 @@ mod tests {
         let mut lines = include_str!("../../../test/process_fcc_options/4.txt")
             .lines()
             .map(String::from)
+            .enumerate()
             .peekable();
 
         process_next_indent_level(&mut lines, &mut config).unwrap();
@@ -250,6 +255,7 @@ mod tests {
         let mut lines = include_str!("../../../test/process_fcc_options/5.txt")
             .lines()
             .map(String::from)
+            .enumerate()
             .peekable();
 
         process_next_indent_level(&mut lines, &mut config).unwrap();
@@ -268,6 +274,7 @@ mod tests {
         let mut lines = include_str!("../../../test/process_fcc_options/6.txt")
             .lines()
             .map(String::from)
+            .enumerate()
             .peekable();
 
         process_next_indent_level(&mut lines, &mut config).unwrap();

@@ -1,4 +1,4 @@
-use std::{io, str::FromStr};
+use std::{collections::BTreeSet, io, str::FromStr};
 
 use options::{ComplianceOptionsContainer, MatchOption, StateOption};
 use regex::Regex;
@@ -70,7 +70,8 @@ fn process_parent_compliance_check(
 
         if !matching_items.is_empty() {
             // items can match only once
-            same_level_items.retain(|f| !matching_items.contains(&f));
+            let to_remove = BTreeSet::from_iter(matching_items);
+            same_level_items.retain(|f| !to_remove.contains(&f));
         }
     }
 

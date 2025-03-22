@@ -60,7 +60,7 @@ impl ComplianceOptionsBuilder {
 }
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ComplianceOptions {
     pub(crate) regex: bool,
     pub(crate) state: StateOption,
@@ -88,7 +88,7 @@ impl Default for ComplianceOptions {
 }
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
-#[derive(Debug, Default, Copy, Clone, EnumString, PartialEq)]
+#[derive(Debug, Default, Copy, Clone, EnumString, PartialEq, Eq, PartialOrd, Ord)]
 #[strum(serialize_all = "kebab-case")]
 pub enum MatchOption {
     #[default]
@@ -103,7 +103,7 @@ impl fmt::Display for MatchOption {
 }
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
-#[derive(Debug, Default, Copy, Clone, EnumString, PartialEq)]
+#[derive(Debug, Default, Copy, Clone, EnumString, PartialEq, Eq, PartialOrd, Ord)]
 #[strum(serialize_all = "kebab-case")]
 pub enum StateOption {
     #[default]
