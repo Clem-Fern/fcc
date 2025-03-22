@@ -68,7 +68,9 @@ pub(crate) fn process_next_indent_level(
 
     let same_indent: Vec<FlatConfigItem> = vals
         .take(nb_same_indent)
-        .map(|(i, f) | FlatConfigItem::Line(FlatConfigLine::new(i, &f[previous_parent_indent..f.len()])))
+        .map(|(i, f)| {
+            FlatConfigItem::Line(FlatConfigLine::new(i, &f[previous_parent_indent..f.len()]))
+        })
         .collect();
 
     trace!(

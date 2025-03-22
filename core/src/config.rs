@@ -203,7 +203,12 @@ impl FlatConfigParent {
         }
     }
 
-    pub fn new_with_items(index: usize, indent: usize, key: String, items: Vec<FlatConfigItem>) -> Self {
+    pub fn new_with_items(
+        index: usize,
+        indent: usize,
+        key: String,
+        items: Vec<FlatConfigItem>,
+    ) -> Self {
         Self {
             index,
             indent,
