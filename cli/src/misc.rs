@@ -15,7 +15,5 @@ pub fn get_log_level(cli: &Cli) -> LevelFilter {
         return LevelFilter::Off;
     }
 
-    // todo: json output ?
-
     cli.verbose.log_level_filter()
 }

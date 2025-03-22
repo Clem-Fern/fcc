@@ -134,9 +134,7 @@ fn test_process_parent_compliance_check_regex_match_first() {
     let result = process_parent_compliance_check(&policy, &config);
 
     assert_eq!(result.len(), 1);
-    for r in result {
-        assert!(matches!(r.result, Ok(_)))
-    }
+    assert!(matches!(result[0].result, Ok(_)))
 }
 
 #[test]
@@ -208,10 +206,28 @@ fn test_process_parent_compliance_check_absent_match_first() {
     .unwrap();
     let result = process_parent_compliance_check(&policy, &config);
 
-    assert_eq!(result.len(), 4);
+    assert_eq!(result.len(), 3);
     assert!(matches!(result[0].result, Err(_)));
 
     for i in 1..2 {
         assert!(matches!(result[i].result, Ok(_)))
+    }
+}
+
+#[test]
+fn test_process_parent_compliance_remove_first_already_match_item_when_identical() {
+    let policy = FlatConfigCompliance::from_str(include_str!(
+        "../../test/process_parent_compliance_check/12_p.txt"
+    ))
+    .unwrap();
+    let config = FlatConfig::from_str(include_str!(
+        "../../test/process_parent_compliance_check/8_c.txt"
+    ))
+    .unwrap();
+    let result = process_parent_compliance_check(&policy, &config);
+
+    assert_eq!(result.len(), 2);
+    for r in result {
+        assert!(matches!(r.result, Ok(_)))
     }
 }

@@ -1,6 +1,6 @@
 use std::{io, str::FromStr};
 
-use options::{ComplianceOptionsContainer, StateOption};
+use options::{ComplianceOptionsContainer, MatchOption, StateOption};
 use regex::Regex;
 
 use crate::{
@@ -39,51 +39,38 @@ fn process_parent_compliance_check(
             None
         };
 
-        let matching_items: Vec<&FlatConfigItem> = current_same_level_items
-            .iter()
-            .filter(|f| -> bool {
-                let mut eq = item.eq(f);
+        let predicate = |f: &&FlatConfigItem| -> bool {
+            let mut eq = item.eq(f);
 
-                if let Some(regex) = regex.clone() {
-                    eq = regex.is_match(f.get_item_key());
-                }
+            if let Some(regex) = regex.clone() {
+                eq = regex.is_match(f.get_item_key());
+            }
 
-                if matches!(item_options.state, StateOption::Present) {
-                    // is_variant_eq check eq enum variant type
-                    eq = eq && item.is_variant_eq(f);
-                }
+            if matches!(item_options.state, StateOption::Present) {
+                // is_variant_eq check eq enum variant type
+                eq = eq && item.is_variant_eq(f);
+            }
 
-                eq
-            })
-            .collect();
+            eq
+        };
+
+        let matching_items: Vec<&FlatConfigItem> =
+            if matches!(item_options.r#match, MatchOption::First) {
+                current_same_level_items
+                    .iter()
+                    .find(predicate)
+                    .into_iter()
+                    .collect()
+            } else {
+                current_same_level_items.iter().filter(predicate).collect()
+            };
 
         let mut cr = process_item_matches_compliance(item, matching_items.clone());
         compliance_result.append(&mut cr);
 
         if !matching_items.is_empty() {
             // items can match only once
-            if item_options.regex {
-                // remove already matched items
-                same_level_items = current_same_level_items
-                    .clone()
-                    .into_iter()
-                    .filter(|f| -> bool { !matching_items.contains(&f) })
-                    .collect::<Vec<FlatConfigItem>>();
-            } else {
-                // if not regex, only remove first matched item
-                let first_match = matching_items.first().unwrap(); // safe
-                let mut found_match = false;
-                same_level_items = same_level_items
-                    .into_iter()
-                    .filter(|f| -> bool {
-                        if !found_match && f.eq(first_match) && f.is_variant_eq(first_match) {
-                            found_match = true;
-                            return false;
-                        }
-                        true
-                    })
-                    .collect::<Vec<FlatConfigItem>>();
-            }
+            same_level_items.retain(|f| !matching_items.contains(&f));
         }
     }
 
@@ -192,24 +179,23 @@ impl ItemsContainer for FlatConfigCompliance {
     }
 }
 
-// TODO: remove this ?
 impl ComplianceOptionsContainer for FlatConfigCompliance {
     fn get_options(&self) -> options::ComplianceOptions {
-        todo!()
+        unreachable!()
     }
 
     fn set_options(&mut self, _options: options::ComplianceOptions) {
-        todo!()
+        unreachable!()
     }
 
     #[cfg(debug_assertions)]
     fn get_raw_options(&self) -> &Vec<String> {
-        todo!()
+        unreachable!()
     }
 
     #[cfg(debug_assertions)]
     fn set_raw_options(&mut self, _options: &[String]) {
-        todo!()
+        unreachable!()
     }
 }
 
