@@ -51,17 +51,18 @@ impl ItemComplianceResult {
 impl fmt::Display for ItemComplianceResult {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let options = self.policy.get_options();
-        write!(f, "Policy(state: {}", options.state)?;
+        write!(f, "Policy(")?;
+
         if options.state != StateOption::default() {
-            write!(f, "state: {}", options.state)?;
+            write!(f, "state: {},", options.state)?;
         }
 
         if options.regex {
-            write!(f, ", regex=true")?;
+            write!(f, "regex=true,")?;
         }
 
         if options.r#match != MatchOption::default() {
-            write!(f, ", match={}", options.r#match)?;
+            write!(f, "match={}", options.r#match)?;
         }
 
         write!(f, ") \"{}\" ", self.policy.get_item_key())?;
