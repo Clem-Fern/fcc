@@ -1,0 +1,7 @@
+#[state=optional]
+line1
+#[state=optional]
+line2
+    line3
+#[state=optional]
+line4

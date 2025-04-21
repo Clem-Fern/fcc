@@ -5,11 +5,14 @@ use regex::Regex;
 
 use crate::{config::FlatConfigItem, parse::ItemsContainer};
 
-use super::{error::ParseError, ComplianceOptions, ComplianceOptionsContainer, MatchOption};
+use super::{
+    error::ParseError, ComplianceOptions, ComplianceOptionsBuilder, ComplianceOptionsContainer,
+    MatchOption, StateOption,
+};
 
 lazy_static! {
     // USE TO CAPTURE OPTION
-    pub static ref COMPLIANCE_OPTION_REGEX: Regex = Regex::new(r"^[^\S\r\n]*#\[(?<option>\w+)(=(?<arg>\w+))?][^\S\r\n]*$").unwrap();
+    pub static ref COMPLIANCE_OPTION_REGEX: Regex = Regex::new(r"^[^\S\r\n]*#\[(?<option>\w+)(=(?<arg>[\w-]+))?][^\S\r\n]*$").unwrap();
 }
 
 pub(crate) fn process_fcc_options(parent: &mut dyn ItemsContainer) -> Result<(), ParseError> {
@@ -52,7 +55,7 @@ pub(crate) fn process_fcc_options(parent: &mut dyn ItemsContainer) -> Result<(),
         }
 
         if let FlatConfigItem::Parent(ref mut parent) = item_with_options {
-            if matches!(parent.get_options().match_type, MatchOption::Absent) {
+            if matches!(parent.get_options().state, StateOption::Absent) {
                 // If parent must be absent, ignore children items
                 item_with_options = FlatConfigItem::Line(parent.clone().into())
             } else {
@@ -72,7 +75,7 @@ pub(crate) fn process_fcc_options(parent: &mut dyn ItemsContainer) -> Result<(),
 }
 
 pub(super) fn parse_raw_options(
-    compliance_option: &mut ComplianceOptions,
+    compliance_option: &mut ComplianceOptionsBuilder,
     raw_options: &[String],
 ) -> Result<(), ParseError> {
     for option in raw_options {
@@ -80,17 +83,32 @@ pub(super) fn parse_raw_options(
             let o = &caps["option"];
             match o {
                 "regex" => {
-                    compliance_option.regex = true;
+                    compliance_option.regex(true)?;
                 }
-                "match" => {
+                "state" => {
                     if let Some(arg) = caps.name("arg") {
-                        compliance_option.match_type = MatchOption::from_str(arg.as_str())
-                            .map_err(|_| {
+                        compliance_option.state(StateOption::from_str(arg.as_str()).map_err(
+                            |_| {
                                 ParseError::InvalidOptionArgument(
                                     String::from(arg.as_str()),
                                     String::from(option),
                                 )
-                            })?;
+                            },
+                        )?)?;
+                    } else {
+                        return Err(ParseError::MalformedOption(String::from(option)));
+                    }
+                }
+                "match" => {
+                    if let Some(arg) = caps.name("arg") {
+                        compliance_option.r#match(MatchOption::from_str(arg.as_str()).map_err(
+                            |_| {
+                                ParseError::InvalidOptionArgument(
+                                    String::from(arg.as_str()),
+                                    String::from(option),
+                                )
+                            },
+                        )?)?;
                     } else {
                         return Err(ParseError::MalformedOption(String::from(option)));
                     }
@@ -130,6 +148,7 @@ mod tests {
             .lines()
             .filter(|f| !COMPLIANCE_OPTION_REGEX.is_match(f))
             .map(String::from)
+            .enumerate()
             .peekable();
 
         process_next_indent_level(&mut lines, &mut config).unwrap();
@@ -149,6 +168,7 @@ mod tests {
             .lines()
             .filter(|l| filter_line(l, None))
             .map(String::from)
+            .enumerate()
             .peekable();
 
         process_next_indent_level(&mut lines, &mut config).unwrap();
@@ -169,25 +189,26 @@ mod tests {
             .lines()
             .filter(|l| filter_line(l, None))
             .map(String::from)
+            .enumerate()
             .peekable();
 
         process_next_indent_level(&mut lines, &mut config).unwrap();
 
         process_fcc_options(&mut config).unwrap();
 
-        let item1 = config.items.get(0).unwrap();
+        let item1 = config.items.first().unwrap();
         assert_eq!(item1.get_raw_options().len(), 1);
         if let FlatConfigItem::Parent(parent) = item1 {
-            let item2 = parent.items.get(0).unwrap();
+            let item2 = parent.items.first().unwrap();
             assert_eq!(item2.get_raw_options().len(), 1);
             if let FlatConfigItem::Parent(parent) = item2 {
-                let item3 = parent.items.get(0).unwrap();
+                let item3 = parent.items.first().unwrap();
                 assert_eq!(item3.get_raw_options().len(), 1);
             } else {
-                assert!(false)
+                panic!()
             }
         } else {
-            assert!(false)
+            panic!()
         }
     }
 
@@ -198,6 +219,7 @@ mod tests {
         let mut lines = include_str!("../../../test/process_fcc_options/3.txt")
             .lines()
             .map(String::from)
+            .enumerate()
             .peekable();
 
         process_next_indent_level(&mut lines, &mut config).unwrap();
@@ -205,7 +227,7 @@ mod tests {
         process_fcc_options(&mut config).unwrap();
 
         assert!(matches!(
-            config.items.get(0).unwrap(),
+            config.items.first().unwrap(),
             FlatConfigItem::Line(_)
         ));
     }
@@ -217,6 +239,7 @@ mod tests {
         let mut lines = include_str!("../../../test/process_fcc_options/4.txt")
             .lines()
             .map(String::from)
+            .enumerate()
             .peekable();
 
         process_next_indent_level(&mut lines, &mut config).unwrap();
@@ -232,6 +255,7 @@ mod tests {
         let mut lines = include_str!("../../../test/process_fcc_options/5.txt")
             .lines()
             .map(String::from)
+            .enumerate()
             .peekable();
 
         process_next_indent_level(&mut lines, &mut config).unwrap();
@@ -250,6 +274,7 @@ mod tests {
         let mut lines = include_str!("../../../test/process_fcc_options/6.txt")
             .lines()
             .map(String::from)
+            .enumerate()
             .peekable();
 
         process_next_indent_level(&mut lines, &mut config).unwrap();
@@ -266,7 +291,7 @@ mod tests {
     fn test_parse_fcc_options_1() {
         let options = vec![
             String::from(" #[regex]   "),
-            String::from("     #[match=present]  "),
+            String::from("     #[state=present]  "),
         ];
 
         let options = ComplianceOptions::new_from_vec(&options);
@@ -274,14 +299,16 @@ mod tests {
         let options = options.unwrap();
 
         assert!(options.regex);
-        assert!(matches!(options.match_type, MatchOption::Present));
+        assert!(matches!(options.state, StateOption::Present));
+        assert!(matches!(options.r#match, MatchOption::All));
     }
 
     #[test]
     fn test_parse_fcc_options_2() {
         let options = vec![
             String::from(" #[regex]   "),
-            String::from("     #[match=absent]  "),
+            String::from(" #[match=first]   "),
+            String::from("     #[state=absent]  "),
         ];
 
         let options = ComplianceOptions::new_from_vec(&options);
@@ -289,14 +316,16 @@ mod tests {
         let options = options.unwrap();
 
         assert!(options.regex);
-        assert!(matches!(options.match_type, MatchOption::Absent));
+        assert!(matches!(options.state, StateOption::Absent));
+        assert!(matches!(options.r#match, MatchOption::First));
     }
 
     #[test]
     fn test_parse_fcc_options_3() {
         let options = vec![
             String::from(" #[regex]   "),
-            String::from("     #[match=optional]  "),
+            String::from(" #[match=all]   "),
+            String::from("     #[state=optional]  "),
         ];
 
         let options = ComplianceOptions::new_from_vec(&options);
@@ -304,15 +333,33 @@ mod tests {
         let options = options.unwrap();
 
         assert!(options.regex);
-        assert!(matches!(options.match_type, MatchOption::Optional));
+        assert!(matches!(options.r#match, MatchOption::All));
+        assert!(matches!(options.state, StateOption::Optional));
+    }
+
+    #[test]
+    fn test_parse_fcc_options_4() {
+        let options = vec![String::from("     #[state=present]  ")];
+
+        let options = ComplianceOptions::new_from_vec(&options);
+        assert!(options.is_ok());
+        let options = options.unwrap();
+
+        assert!(!options.regex);
+        assert!(matches!(options.r#match, MatchOption::First));
+        assert!(matches!(options.state, StateOption::Present));
     }
 
     #[test]
     fn test_parse_fcc_options_malformed() {
-        let err = ComplianceOptions::new_from_vec(&vec![String::from(" lkjhlkjh   ")]).unwrap_err();
+        let err = ComplianceOptions::new_from_vec(&[String::from(" lkjhlkjh   ")]).unwrap_err();
         assert!(matches!(err, ParseError::MalformedOption(_)));
 
-        let err = ComplianceOptions::new_from_vec(&vec![String::from(" #[match]   ")]).unwrap_err();
+        let err =
+            ComplianceOptions::new_from_vec(&[String::from("      #[state]   ")]).unwrap_err();
+        assert!(matches!(err, ParseError::MalformedOption(_)));
+
+        let err = ComplianceOptions::new_from_vec(&[String::from(" #[match]   ")]).unwrap_err();
         assert!(matches!(err, ParseError::MalformedOption(_)));
     }
 
@@ -327,7 +374,28 @@ mod tests {
     #[test]
     fn test_parse_fcc_options_invalid_arg() {
         let err =
-            ComplianceOptions::new_from_vec(&vec![String::from(" #[match=arg1]   ")]).unwrap_err();
+            ComplianceOptions::new_from_vec(&[String::from(" #[state=arg1]   ")]).unwrap_err();
         assert!(matches!(err, ParseError::InvalidOptionArgument(_, _)));
+
+        let err =
+            ComplianceOptions::new_from_vec(&[String::from(" #[match=arg1]   ")]).unwrap_err();
+        assert!(matches!(err, ParseError::InvalidOptionArgument(_, _)));
+    }
+
+    #[test]
+    fn test_parse_fcc_options_duplicated() {
+        let err = ComplianceOptions::new_from_vec(&[
+            String::from(" #[state=present]   "),
+            String::from("#[state=present]"),
+        ])
+        .unwrap_err();
+        assert!(matches!(err, ParseError::DuplicatedOption(_)));
+
+        let err = ComplianceOptions::new_from_vec(&[
+            String::from(" #[match=all]   "),
+            String::from(" #[match=all]   "),
+        ])
+        .unwrap_err();
+        assert!(matches!(err, ParseError::DuplicatedOption(_)));
     }
 }

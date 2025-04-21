@@ -36,10 +36,10 @@ where
         .lines()
         .map(String::from)
         .filter(|l| filter_line(l, Some(options.clone().into())))
-        .peekable();
+        .enumerate();
 
     let mut lines = lines
-        .filter(|l| {
+        .filter(|(_, l)| {
             if l.trim().is_empty() {
                 return false;
             }
@@ -57,18 +57,20 @@ where
 }
 
 pub(crate) fn process_next_indent_level(
-    vals: &mut Peekable<impl Iterator<Item = String> + Clone>,
+    vals: &mut Peekable<impl Iterator<Item = (usize, String)> + Clone>,
     previous_parent: &mut dyn ItemsContainer,
 ) -> Result<(), ParseError> {
     let previous_parent_indent = previous_parent.get_indent();
     let nb_same_indent = vals
         .clone()
-        .take_while(|t| nb_whitespace_at_start(t) == previous_parent_indent)
+        .take_while(|(_, t)| nb_whitespace_at_start(t) == previous_parent_indent)
         .count();
 
     let same_indent: Vec<FlatConfigItem> = vals
         .take(nb_same_indent)
-        .map(|f| FlatConfigItem::Line(FlatConfigLine::new(&f[previous_parent_indent..f.len()])))
+        .map(|(i, f)| {
+            FlatConfigItem::Line(FlatConfigLine::new(i, &f[previous_parent_indent..f.len()]))
+        })
         .collect();
 
     trace!(
@@ -79,7 +81,7 @@ pub(crate) fn process_next_indent_level(
 
     previous_parent.appends_items(&same_indent);
 
-    while let Some(next_val) = vals.peek() {
+    while let Some((i, next_val)) = vals.peek() {
         let indent = nb_whitespace_at_start(next_val);
 
         trace!(
@@ -102,7 +104,7 @@ pub(crate) fn process_next_indent_level(
                 trace!("next value: indent {}, found: {}, compare with previous indent {}: get or create parent", indent, next_val, previous_parent.get_indent());
                 let previous_item = previous_parent.pop_last_item().unwrap();
                 let mut parent = match previous_item {
-                    FlatConfigItem::Line(line) => FlatConfigParent::new(indent, line.line),
+                    FlatConfigItem::Line(line) => FlatConfigParent::new(*i, indent, line.line),
                     FlatConfigItem::Parent(_) => {
                         trace!("next value: indent {}, found: {}, compare with previous indent {}: already a parent", indent, next_val, previous_parent.get_indent());
                         return Err(ParseError::BadIndentation(String::from(next_val)));
@@ -132,15 +134,16 @@ mod tests {
 
     #[test]
     fn test_process_next_indent_level_empty() {
-        let mut config = FlatConfigParent::new(1, String::from("test"));
+        let mut config = FlatConfigParent::new(0, 1, String::from("test"));
         let mut lines = include_str!("../../test/process_next_indent_level/1.txt")
             .lines()
             .map(String::from)
+            .enumerate()
             .peekable();
 
         process_next_indent_level(&mut lines, &mut config).unwrap();
 
-        assert_eq!(config.items.is_empty(), true);
+        assert!(config.items.is_empty());
     }
 
     #[test]
@@ -149,6 +152,7 @@ mod tests {
         let mut lines = include_str!("../../test/process_next_indent_level/1.txt")
             .lines()
             .map(String::from)
+            .enumerate()
             .peekable();
 
         process_next_indent_level(&mut lines, &mut config).unwrap();
@@ -172,6 +176,7 @@ mod tests {
         let mut lines = include_str!("../../test/process_next_indent_level/2.txt")
             .lines()
             .map(String::from)
+            .enumerate()
             .peekable();
         let lines_count = lines.clone().count();
 
@@ -179,7 +184,7 @@ mod tests {
 
         let mut item = &config;
         for n in 0..lines_count - 2 {
-            let parent = item.items.get(0).unwrap();
+            let parent = item.items.first().unwrap();
             assert!(matches!(parent, FlatConfigItem::Parent(_)));
             if let FlatConfigItem::Parent(parent) = parent {
                 item = parent;
@@ -195,6 +200,7 @@ mod tests {
         let mut lines = include_str!("../../test/process_next_indent_level/3.txt")
             .lines()
             .map(String::from)
+            .enumerate()
             .peekable();
 
         let err = process_next_indent_level(&mut lines, &mut config).unwrap_err();
@@ -207,6 +213,7 @@ mod tests {
         let mut lines = include_str!("../../test/process_next_indent_level/4.txt")
             .lines()
             .map(String::from)
+            .enumerate()
             .peekable();
 
         let err = process_next_indent_level(&mut lines, &mut config).unwrap_err();
@@ -220,7 +227,7 @@ mod tests {
         let config: FlatConfig = parse_configuration(raw, None).unwrap();
 
         assert_eq!(config.items.len(), 2);
-        let item = config.items.get(0).unwrap();
+        let item = config.items.first().unwrap();
         assert!(item.get_options().regex);
         assert!(matches!(item, FlatConfigItem::Parent(_)));
         if let FlatConfigItem::Parent(parent) = item {
@@ -240,7 +247,7 @@ mod tests {
         let config: FlatConfig = parse_configuration(raw, Some(options)).unwrap();
 
         assert_eq!(config.items.len(), 2);
-        let item = config.items.get(0).unwrap();
+        let item = config.items.first().unwrap();
         assert_eq!(item.get_options(), ComplianceOptions::default());
     }
 }
