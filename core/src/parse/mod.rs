@@ -1,6 +1,7 @@
 pub mod error;
 pub mod filter;
 pub(crate) mod misc;
+pub(crate) mod option;
 use std::{cmp::Ordering, iter::Peekable};
 
 use error::ParseError;

@@ -19,3 +19,4 @@ regex = { workspace = true }
 lazy_static = "1.5.0"
 strum = { version = "0.27", features = ["derive"] }
 serde = { version = "1", features = ["derive"], optional = true }
+nom = "8.0.0"
