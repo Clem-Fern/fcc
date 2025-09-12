@@ -2,7 +2,7 @@ use std::error;
 use std::fmt;
 use std::io;
 
-pub use crate::compliance::options::error::ParseError as ComplianceOptionParseError;
+use crate::compliance::options::ComplianceOptionsError;
 pub use crate::parse::error::ParseError;
 
 #[derive(Debug)]
@@ -32,8 +32,8 @@ impl From<ParseError> for FlatConfigError {
     }
 }
 
-impl From<ComplianceOptionParseError> for FlatConfigError {
-    fn from(err: ComplianceOptionParseError) -> Self {
+impl From<ComplianceOptionsError> for FlatConfigError {
+    fn from(err: ComplianceOptionsError) -> Self {
         Self::Parse(err.into())
     }
 }

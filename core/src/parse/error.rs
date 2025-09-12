@@ -1,12 +1,12 @@
 use std::error;
 use std::fmt;
 
-use crate::compliance::options::error::ParseError as ComplianceOptionParseError;
+use crate::compliance::options::ComplianceOptionsError;
 
 #[derive(Debug)]
 pub enum ParseError {
     BadIndentation(String),
-    ComplianceOption(ComplianceOptionParseError),
+    ComplianceOption(ComplianceOptionsError),
 }
 
 impl error::Error for ParseError {}
@@ -24,8 +24,8 @@ impl fmt::Display for ParseError {
     }
 }
 
-impl From<ComplianceOptionParseError> for ParseError {
-    fn from(err: ComplianceOptionParseError) -> Self {
+impl From<ComplianceOptionsError> for ParseError {
+    fn from(err: ComplianceOptionsError) -> Self {
         Self::ComplianceOption(err)
     }
 }
