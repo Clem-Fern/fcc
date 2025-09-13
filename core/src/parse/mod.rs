@@ -1,5 +1,7 @@
+pub(crate) mod compliance;
 pub mod error;
 pub mod filter;
+pub(crate) mod indentation;
 pub(crate) mod misc;
 pub(crate) mod options;
 use std::{cmp::Ordering, iter::Peekable};
@@ -13,6 +15,13 @@ use crate::{
     compliance::options::parse::process_fcc_options,
     config::{FlatConfigItem, FlatConfigLine, FlatConfigParent},
 };
+
+pub enum ParsedItem {
+    Section,
+    ComplianceSection,
+    Line,
+    ComplianceLine,
+}
 
 pub trait ItemsContainer {
     fn get_indent(&self) -> usize;
