@@ -13,9 +13,11 @@ pub enum ComplianceOptionsError {
     BadIndentation(String),
     UnknowOption(String),
     MalformedOption(String),
-    DuplicatedOption(ComplianceOption),
     InvalidOptionArgument(String, String),
     InvalidRegex(RegexError, String),
+
+    // new
+    DuplicatedOption(ComplianceOption),
 }
 
 impl error::Error for ComplianceOptionsError {}
