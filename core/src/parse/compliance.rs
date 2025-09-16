@@ -1,11 +1,12 @@
 use std::ops::Not;
 
 use nom::{
-    bytes::complete::take_while, character::complete::newline, multi::many1, sequence::terminated,
-    AsChar, IResult, Parser,
+    AsChar, IResult, Parser, bytes::complete::take_while, character::complete::newline, combinator::{all_consuming, cut, opt}, error::{Error, ErrorKind}, multi::many1, sequence::terminated
 };
 
-use crate::{compliance::options::ComplianceOptions, parse::options::compliance_options};
+use crate::{
+    compliance::options::ComplianceOptions, parse::options::compliance_options,
+};
 
 struct ComplianceItem<'a> {
     options: ComplianceOptions,
@@ -13,19 +14,24 @@ struct ComplianceItem<'a> {
 }
 
 fn compliance_items(input: &str) -> IResult<&str, Vec<ComplianceItem>> {
-    many1(terminated(compliance_item, newline)).parse(input)
+    all_consuming(many1(compliance_item)).parse(input)
 }
 
 fn compliance_item(input: &str) -> IResult<&str, ComplianceItem> {
-    (
-        compliance_options,
-        take_while(|c: char| c.is_newline().not()),
-    )
+    terminated((compliance_options, compliance_item_content), opt(newline))
         .map(|(options, content)| ComplianceItem {
             options,
             content: content,
         })
         .parse(input)
+}
+
+fn compliance_item_content(input: &str) -> IResult<&str, &str> {
+    let (output, content) = take_while(|c: char| c.is_newline().not()).parse(input)?;
+    if content.trim().is_empty() {
+        return Err(nom::Err::Error(Error::new(input, ErrorKind::Fail)));
+    }
+    Ok((output, content))
 }
 
 #[cfg(test)]
@@ -62,7 +68,7 @@ mod tests {
         let result = compliance_item(input);
         assert!(result.is_ok());
         let (remaining, item) = result.unwrap();
-        assert_eq!(remaining, "\n");
+        assert_eq!(remaining, "");
         assert_eq!(item.options.regex, false);
         assert_eq!(item.options.r#match, MatchOption::All);
         assert_eq!(item.content, "Some content here");
@@ -74,7 +80,7 @@ mod tests {
         let result = compliance_item(input);
         assert!(result.is_ok());
         let (remaining, item) = result.unwrap();
-        assert_eq!(remaining, "\nSome other content");
+        assert_eq!(remaining, "Some other content");
         assert_eq!(item.options.regex, false);
         assert_eq!(item.options.state, StateOption::Absent);
         assert_eq!(item.options.r#match, MatchOption::All);
@@ -117,8 +123,26 @@ mod tests {
         assert_eq!(items[2].content, "Third content without options");
     }
 
-    #[test]
+        #[test]
     fn test_compliance_items_3() {
+        let input =
+            "#[regex]\nFirst content\n#[match=all]\nSecond content\nThird content without options\nFourth content";
+        let result = compliance_items(input);
+        let (remaining, items) = result.unwrap();
+        assert_eq!(remaining, "");
+        assert_eq!(items.len(), 4);
+        assert_eq!(items[0].options.regex, true);
+        assert_eq!(items[0].content, "First content");
+        assert_eq!(items[1].options.r#match, MatchOption::All);
+        assert_eq!(items[1].content, "Second content");
+        assert_eq!(items[2].options, ComplianceOptions::default());
+        assert_eq!(items[2].content, "Third content without options");
+        assert_eq!(items[3].options, ComplianceOptions::default());
+        assert_eq!(items[3].content, "Fourth content");
+    }
+
+    #[test]
+    fn test_compliance_items_4() {
         let input = "#[regex]\nFirst content\n#[match=all]\n";
         let result = compliance_items(input);
         assert!(result.is_err());

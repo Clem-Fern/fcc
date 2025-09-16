@@ -6,6 +6,7 @@ use crate::compliance::options::ComplianceOptionsError;
 #[derive(Debug)]
 pub enum ParseError {
     BadIndentation(String),
+    OrphanComplianceOption,
     ComplianceOption(ComplianceOptionsError),
 }
 
@@ -19,6 +20,12 @@ impl fmt::Display for ParseError {
             }
             Self::ComplianceOption(ref err) => {
                 write!(f, "{err}")
+            }
+            Self::OrphanComplianceOption => {
+                write!(
+                    f,
+                    "Orphan compliance options found without associated content.\""
+                )
             }
         }
     }
