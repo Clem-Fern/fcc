@@ -1,12 +1,16 @@
 use std::ops::Not;
 
 use nom::{
-    AsChar, IResult, Parser, bytes::complete::take_while, character::complete::newline, combinator::{all_consuming, cut, opt}, error::{Error, ErrorKind}, multi::many1, sequence::terminated
+    bytes::complete::take_while,
+    character::complete::newline,
+    combinator::{all_consuming, cut, opt},
+    error::{Error, ErrorKind},
+    multi::many1,
+    sequence::terminated,
+    AsChar, IResult, Parser,
 };
 
-use crate::{
-    compliance::options::ComplianceOptions, parse::options::compliance_options,
-};
+use crate::{compliance::options::ComplianceOptions, parse::options::compliance_options};
 
 struct ComplianceItem<'a> {
     options: ComplianceOptions,
@@ -123,7 +127,7 @@ mod tests {
         assert_eq!(items[2].content, "Third content without options");
     }
 
-        #[test]
+    #[test]
     fn test_compliance_items_3() {
         let input =
             "#[regex]\nFirst content\n#[match=all]\nSecond content\nThird content without options\nFourth content";
