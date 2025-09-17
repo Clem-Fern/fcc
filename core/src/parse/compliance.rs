@@ -3,7 +3,7 @@ use std::ops::Not;
 use nom::{
     bytes::complete::take_while,
     character::complete::newline,
-    combinator::{all_consuming, cut, opt},
+    combinator::{all_consuming, opt},
     error::{Error, ErrorKind},
     multi::many1,
     sequence::terminated,

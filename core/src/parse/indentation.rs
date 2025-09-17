@@ -1,10 +1,24 @@
-// use nom::{combinator::all_consuming, multi::many0, IResult};
+use nom::IResult;
 
-// struct IndentationItem<'a> {
-//     level: usize,
-//     content: &'a str,
-// }
+use crate::error::ParseError;
 
-// pub fn parse_indentation(input: &str) -> IResult<&str, Vec<IndentationItem>> {
-//     all_consuming(many0())
-// }
+enum IndentedItem<'a> {
+    IndentationMarker(Indentation),
+    Block(&'a str),
+}
+
+enum Indentation {
+    Indent(usize),
+    Dedent(usize),
+}
+
+pub fn parse_indentation(input: &str) -> Result<Vec<IndentedItem>, ParseError> {
+    let mut items = Vec::new();
+    let mut current_indent: Indentation = Indentation::Indent(0);
+
+    Ok(items)
+}
+
+pub fn same_indentation_block(input: &str) -> IResult<&str, Vec<IndentedItem>> {
+    todo!()
+}
